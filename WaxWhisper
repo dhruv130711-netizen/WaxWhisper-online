@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WaxWhisper Shop</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f7f7f7;
+}
+header {
+  background: #222;
+  color: #fff;
+  padding: 15px;
+  text-align: center;
+}
+h1 { margin: 0; }
+.tagline { font-size: 14px; color: #ddd; }
+
+.filters {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 10px;
+}
+.filters button {
+  padding: 8px 12px;
+  border: none;
+  background: #ddd;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 10px;
+  padding: 10px;
+}
+
+.card {
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+}
+.card img {
+  width: 100%;
+  border-radius: 8px;
+}
+button.add {
+  width: 100%;
+  padding: 8px;
+  background: #ff7a18;
+  color: #fff;
+  border: none;
+  margin-top: 5px;
+}
+
+.cart-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #000;
+  color: #fff;
+  padding: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.cart {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  max-height: 80%;
+  background: #fff;
+  display: none;
+  overflow: auto;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 15px;
+}
+
+.whatsapp {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background: green;
+  color: white;
+  padding: 10px;
+  border-radius: 50%;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>WaxWhisper Shop</h1>
+  <div class="tagline">Fresh Finds, Best Prices</div>
+</header>
+
+<div class="filters">
+  <button onclick="filter('all')">All</button>
+  <button onclick="filter('Candles')">Candles</button>
+  <button onclick="filter('Decor')">Decor</button>
+  <button onclick="filter('Beverages')">Beverages</button>
+</div>
+
+<div class="grid" id="products"></div>
+
+<div class="cart-btn" onclick="toggleCart()">🛒 <span id="count">0</span></div>
+
+<div class="cart" id="cart"></div>
+
+<a class="whatsapp" href="https://wa.me/91XXXXXXXXXX" target="_blank">💬</a>
+
+<script>
+const products = [
+{ name:"Classic Candle", price:199, cat:"Candles", img:"https://i.ibb.co/QFpQPKgv/81v79cn3-Ls-L-SL1500.jpg" },
+{ name:"Aesthetic Candle", price:249, cat:"Candles", img:"https://i.ibb.co/pFgDBzL/1000013707158-1000013707157-02-2100.jpg" },
+{ name:"Luxury Jar Candle", price:399, cat:"Candles", img:"https://i.ibb.co/fd8PrhNJ/61-T9mbzbt-HL-AC-UF1000-1000-QL80.jpg" },
+{ name:"Flower Candle", price:299, cat:"Candles", img:"https://i.ibb.co/3yQTmmrm/61o0-BYcqat-L-AC-UF1000-1000-QL80.jpg" },
+{ name:"Designer Candle", price:349, cat:"Decor", img:"https://i.ibb.co/QFpQPKgv/81v79cn3-Ls-L-SL1500.jpg" },
+{ name:"Glass Candle", price:279, cat:"Decor", img:"https://i.ibb.co/pFgDBzL/1000013707158-1000013707157-02-2100.jpg" },
+{ name:"Cold Coffee", price:120, cat:"Beverages", img:"https://i.ibb.co/fd8PrhNJ/61-T9mbzbt-HL-AC-UF1000-1000-QL80.jpg" },
+{ name:"Mocktail", price:150, cat:"Beverages", img:"https://i.ibb.co/3yQTmmrm/61o0-BYcqat-L-AC-UF1000-1000-QL80.jpg" }
+];
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function renderProducts(list){
+  const el = document.getElementById("products");
+  el.innerHTML="";
+  list.forEach((p,i)=>{
+    el.innerHTML += `
+    <div class="card">
+      <img src="${p.img}" loading="lazy">
+      <h4>${p.name}</h4>
+      <p>₹${p.price}</p>
+      <button class="add" onclick="add(${i})">Add to Cart</button>
+    </div>`;
+  });
+}
+
+function filter(cat){
+  if(cat==="all") renderProducts(products);
+  else renderProducts(products.filter(p=>p.cat===cat));
+}
+
+function add(i){
+  const item = cart.find(c=>c.name===products[i].name);
+  if(item) item.qty++;
+  else cart.push({...products[i], qty:1});
+  save();
+}
+
+function save(){
+  localStorage.setItem("cart", JSON.stringify(cart));
+  document.getElementById("count").innerText = cart.reduce((a,b)=>a+b.qty,0);
+}
+
+function toggleCart(){
+  const c = document.getElementById("cart");
+  c.style.display = c.style.display==="block"?"none":"block";
+  renderCart();
+}
+
+function renderCart(){
+  const c = document.getElementById("cart");
+  let html="<h3
